@@ -1,5 +1,10 @@
 const app = require("./app");
-const PORT = process.env.PORT || 5000;
+const constants = require("./config/constants");
+
+const PORT = constants.PORT;
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  const HOST = constants.HOST
+  const PROTOCOL = constants.PROTOCOL
+  console.log(`Server running on ${PROTOCOL}://${HOST}:${PORT}`);
 });

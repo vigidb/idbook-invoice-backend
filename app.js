@@ -18,6 +18,11 @@ app.use(express.json());
 app.use(cors());
 app.use(rateLimiter);
 
+// Home Page Route
+app.get('/', (req, res) => {
+    res.send('<h1>Welcome to the Invoice API</h1><p>Visit the <a href="/api-docs">API Documentation</a></p>');
+});
+
 // Swagger setup
 app.use('/api-docs', swaggerMiddleware, swaggerUiSetup);
 

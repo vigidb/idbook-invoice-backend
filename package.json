@@ -8,7 +8,10 @@
     "test": "jest --verbose",
     "lint": "eslint .",
     "docs": "swagger-jsdoc -d swaggerDef.js -o swagger-output.json",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
+    "docker:test": "docker-compose -f docker-compose.test.yml up --build",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up --build"
   },
   "keywords": [],
   "author": "",
