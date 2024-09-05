@@ -6,7 +6,7 @@ const InvoiceSchema = new mongoose.Schema(
     footer: String,
     invoiceNumber: { type: String, required: true, unique: true },
     invoiceDate: { type: Date, required: true },
-    dueDate: { type: Date, required: true },
+    dueDate: { type: Date},
     notes: String,
     billedBy: {
       name: String,

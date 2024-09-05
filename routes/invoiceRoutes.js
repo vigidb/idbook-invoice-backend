@@ -4,7 +4,9 @@ const {
   getInvoices,
   updateInvoice,
   deleteInvoice,
-  getInvoice
+  getInvoice,
+  generateNewInvoiceNumber,
+  patchInvoice
 } = require("../controllers/invoiceController");
 // const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
@@ -57,14 +59,40 @@ router
 
 /**
  * @swagger
+ * /api/invoices/generate-invoice-number:
+ *   get:
+ *     summary: Generate a new invoice number
+ *     tags: [Invoices]
+ *     responses:
+ *       200:
+ *         description: A new invoice number generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 invoiceNumber:
+ *                   type: string
+ *       400:
+ *         description: Error generating invoice number
+ */
+router
+  .route("/generate-invoice-number")
+  .get(generateNewInvoiceNumber);
+
+/**
+ * @swagger
  * /api/invoices/{id}:
  *   get:
- *     summary: Retrieve a single invoice by ID
+ *     summary: Retrieve a single invoice by ID or invoice number
  *     tags: [Invoices]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
+ *         description: The invoice ID (MongoDB ObjectId) or invoice number
  *         schema:
  *           type: string
  *     responses:
@@ -77,12 +105,13 @@ router
  *       404:
  *         description: Invoice not found
  *   put:
- *     summary: Update an invoice by ID
+ *     summary: Update an invoice by ID or invoice number
  *     tags: [Invoices]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
+ *         description: The invoice ID (MongoDB ObjectId) or invoice number
  *         schema:
  *           type: string
  *     requestBody:
@@ -103,12 +132,13 @@ router
  *       404:
  *         description: Invoice not found
  *   delete:
- *     summary: Delete an invoice by ID
+ *     summary: Delete an invoice by ID or invoice number
  *     tags: [Invoices]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
+ *         description: The invoice ID (MongoDB ObjectId) or invoice number
  *         schema:
  *           type: string
  *     responses:
@@ -116,12 +146,41 @@ router
  *         description: Invoice deleted successfully
  *       404:
  *         description: Invoice not found
+ *   patch:
+ *     summary: Partially update an invoice by ID or invoice number
+ *     tags: [Invoices]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The invoice ID (MongoDB ObjectId) or invoice number
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Invoice'
+ *     responses:
+ *       200:
+ *         description: The updated invoice with provided fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Invoice'
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: Invoice not found
  */
 router
   .route("/:id")
   .put(updateInvoice)
   .delete(deleteInvoice)
-  .get(getInvoice);
+  .get(getInvoice)
+  .patch(patchInvoice);
+
 module.exports = router;
 
 /**
