@@ -85,26 +85,61 @@ exports.getInvoice = async (req, res) => {
 };
 
 const generateInvoiceNumber = async () => {
-  const lastInvoice = await Invoice.findOne().sort({ invoiceNumber: -1 });
-  
-  // If no invoices found, start with 'INV-001'
+  // Get the current date components (YYYY and MM)
+  const currentYear = new Date().getFullYear();
+  const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0'); // Month is zero-based, so add 1
+
+  // Default starting invoice number
+  const initialInvoiceNumber = 50239;
+
+  // Find the last invoice for the current year and month
+  const lastInvoice = await Invoice.findOne({
+    invoiceNumber: { $regex: `^Idb-${currentYear}-${currentMonth}-` }
+  }).sort({ invoiceNumber: -1 });
+
+  // If no invoices found for the current year and month, start with 'Idb-YYYY-MM-50239'
   if (!lastInvoice || !lastInvoice.invoiceNumber) {
-    return 'INV-001';
+    return `Idb-${currentYear}-${currentMonth}-${initialInvoiceNumber}`;
   }
 
-  // Extract the numeric part from the last invoice number
+  // Extract the numeric part of the last invoice number (after 'Idb-YYYY-MM-')
   const invoiceNumberParts = lastInvoice.invoiceNumber.split('-');
-  const lastNumber = parseInt(invoiceNumberParts[1], 10);
+  const lastNumber = parseInt(invoiceNumberParts[3], 10);
 
-  // If the parsing fails or the invoice number is invalid, reset to 1
+  // If parsing fails or the invoice number is invalid, reset to the initial number
   if (isNaN(lastNumber)) {
-    return 'INV-001';
+    return `Idb-${currentYear}-${currentMonth}-${initialInvoiceNumber}`;
   }
 
-  // Increment the numeric part and return the new invoice number
-  const newInvoiceNumber = `INV-${(lastNumber + 1).toString().padStart(3, '0')}`;
-  return newInvoiceNumber;
+  // Increment the numeric part of the invoice number
+  const newInvoiceNumber = lastNumber + 1;
+
+  // Return the new invoice number in the format 'Idb-YYYY-MM-XXXX'
+  return `Idb-${currentYear}-${currentMonth}-${newInvoiceNumber}`;
 };
+
+
+// const generateInvoiceNumber = async () => {
+//   const lastInvoice = await Invoice.findOne().sort({ invoiceNumber: -1 });
+  
+//   // If no invoices found, start with 'INV-001'
+//   if (!lastInvoice || !lastInvoice.invoiceNumber) {
+//     return 'INV-001';
+//   }
+
+//   // Extract the numeric part from the last invoice number
+//   const invoiceNumberParts = lastInvoice.invoiceNumber.split('-');
+//   const lastNumber = parseInt(invoiceNumberParts[1], 10);
+
+//   // If the parsing fails or the invoice number is invalid, reset to 1
+//   if (isNaN(lastNumber)) {
+//     return 'INV-001';
+//   }
+
+//   // Increment the numeric part and return the new invoice number
+//   const newInvoiceNumber = `INV-${(lastNumber + 1).toString().padStart(3, '0')}`;
+//   return newInvoiceNumber;
+// };
 
 
 
