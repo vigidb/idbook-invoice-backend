@@ -45,7 +45,7 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    command: certonly --webroot -w /var/www/certbot --force-renewal --email vighnesha@idbookhotels.com -d ec2-44-203-114-245.compute-1.amazonaws.com --agree-tos
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email vighnesha@idbookhotels.com -d invoice-api.idbookhotels.com --agree-tos
     networks:
       - app-network
 
