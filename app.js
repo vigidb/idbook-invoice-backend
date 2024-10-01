@@ -16,7 +16,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use(rateLimiter);
+// app.use(rateLimiter);
 
 // Home Page Route
 app.get('/', (req, res) => {

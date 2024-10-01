@@ -8,13 +8,14 @@ const InvoiceSchema = new mongoose.Schema(
     footer: String,
     invoiceNumber: { type: String, required: true, unique: true, index: true }, // Index added for better search performance
     invoiceDate: { type: Date, required: true },
-    dueDate: { type: Date }, 
+    dueDate: { type: Date },
     notes: String,
     billedBy: {
+      id: { type: String },
       name: { type: String, required: true },
       address: { type: String, required: true },
-      GSTIN: { type: String }, 
-      PAN: { type: String }, 
+      GSTIN: { type: String },
+      PAN: { type: String },
       email: {
         type: String,
         validate: {
@@ -36,10 +37,11 @@ const InvoiceSchema = new mongoose.Schema(
       },
     },
     billedTo: {
+      id: { type: String },
       name: { type: String, required: true },
       address: { type: String, required: true },
-      GSTIN: { type: String }, 
-      PAN: { type: String }, 
+      GSTIN: { type: String },
+      PAN: { type: String },
       email: {
         type: String,
         validate: {
@@ -68,14 +70,14 @@ const InvoiceSchema = new mongoose.Schema(
         quantity: { type: Number, required: true, min: 1 },
         price: { type: Number, required: true, min: 0 },
         amount: { type: Number, required: true },
-        tax: { type: Number, min: 0 }, 
+        tax: { type: Number, min: 0 },
       },
     ],
-    GST: { type: Number, min: 0 }, 
+    GST: { type: Number, min: 0 },
     GSTType: { type: String, default: "CGST/SGST" },
     total: { type: Number, required: true, min: 0 }, // Required because it's not virtual
-    totalAmount: { type: Number, min: 0 }, 
-    totalTax: { type: Number, min: 0 }, 
+    totalAmount: { type: Number, min: 0 },
+    totalTax: { type: Number, min: 0 },
     status: {
       type: String,
       enum: ["Pending", "Paid", "Overdue"],
@@ -87,10 +89,12 @@ const InvoiceSchema = new mongoose.Schema(
       {
         date: { type: Date, default: Date.now },
         amount: { type: Number, required: true, min: 0 },
-        paymentMode: { type: String, enum: ["Cash", "Card", "Bank Transfer", "Other"], required: true },
+        paymentMode: { type: String, enum: ["Cash", "Card", "Bank Transfer", "Other", "UPI", "Cheque"], required: true },
         reference: String,
       },
     ],
+    createdBy: { type: String },
+    updatedBy: { type: String },
   },
   { timestamps: true }
 );
@@ -115,7 +119,7 @@ InvoiceSchema.pre("save", function (next) {
 // Custom method to update invoice status based on payment history
 InvoiceSchema.methods.updateStatus = function () {
   const totalPaid = this.paymentHistory.reduce((total, payment) => total + payment.amount, 0);
-  if (totalPaid >= this.totalAmount) {
+  if (totalPaid >= this.total) {
     this.status = "Paid";
   } else if (new Date() > this.dueDate) {
     this.status = "Overdue";
